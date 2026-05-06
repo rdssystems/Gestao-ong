@@ -26,7 +26,7 @@ services:
       WATCHPACK_POLLING: "true"
       DATABASE_URL: postgresql://gestao_ong:%40Slipknot12@postgres:5432/gestao_ong
       NEXTAUTH_SECRET: "f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0"
-      NEXTAUTH_URL: https://sua-maquina.tail1234.ts.net:3000
+      NEXTAUTH_URL: https://servidor-qualificacao.tailbeb7d5.ts.net:8443
     depends_on:
       postgres:
         condition: service_healthy
