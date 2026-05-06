@@ -14,6 +14,7 @@ import {
   GraduationCap,
   Menu,
   X,
+  Settings,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -100,7 +101,20 @@ export function Sidebar() {
           })}
         </nav>
 
-        <div className="p-4 border-t border-border">
+        <div className="p-4 border-t border-border flex flex-col gap-1">
+          <Link
+            href="/configuracoes"
+            onClick={() => setMobileOpen(false)}
+            className={cn(
+              'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all',
+              pathname?.startsWith?.('/configuracoes')
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+            )}
+          >
+            <Settings className="w-5 h-5" />
+            Configurações
+          </Link>
           <Button
             variant="ghost"
             onClick={() => signOut({ callbackUrl: '/login' })}
