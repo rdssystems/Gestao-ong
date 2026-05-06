@@ -27,6 +27,8 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     const fileUrl = `/uploads/alunos/${params.id}/${uniqueFilename}`;
 
     await writeFile(filePath, buffer);
+    const { chmod } = await import('fs/promises');
+    await chmod(filePath, 0o644);
 
     const documento = await prisma.documento.create({
       data: {
