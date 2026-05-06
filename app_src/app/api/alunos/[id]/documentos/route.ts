@@ -39,6 +39,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
     return NextResponse.json(documento, { status: 201 });
   } catch (error: any) {
+    console.error('Erro no upload de documento:', error);
     return NextResponse.json({ error: error.message, stack: error.stack }, { status: 500 });
   }
 }
