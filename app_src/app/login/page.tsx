@@ -54,9 +54,9 @@ export default function LoginPage() {
       />
 
       {/* Glassmorphism Card */}
-      <div className="relative z-10 w-full max-w-[400px] mx-4 p-8 sm:p-10 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl">
-        <div className="text-center mb-8">
-          <h1 className="text-xl font-bold tracking-widest text-white uppercase">Login</h1>
+      <div className="relative z-10 w-[92%] sm:w-full max-w-[400px] p-6 sm:p-10 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+        <div className="text-center mb-10">
+          <h1 className="text-2xl font-bold tracking-[0.2em] text-white uppercase drop-shadow-sm">Login</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -94,12 +94,12 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-2">
-            <Button type="submit" className="bg-[#1a1a2e] hover:bg-[#1a1a2e]/90 text-white border border-white/10 px-8" disabled={loading}>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+            <Button type="submit" className="w-full sm:w-auto bg-[#1a1a2e] hover:bg-[#1a1a2e]/90 text-white border border-white/10 px-10 h-11" disabled={loading}>
               {loading ? '...' : 'Entrar'}
             </Button>
-            <a href="#" className="text-sm text-white hover:text-gray-200 font-medium">
-              Esqueceu a senha ?
+            <a href="#" className="text-sm text-white/80 hover:text-white transition-colors font-medium">
+              Esqueceu a senha?
             </a>
           </div>
 
