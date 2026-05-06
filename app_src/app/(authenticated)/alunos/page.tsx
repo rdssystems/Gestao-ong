@@ -205,42 +205,42 @@ export default function AlunosPage() {
           {alunos?.map?.((a: any, i: number) => (
             <motion.div key={a?.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
               <Card className="hover:shadow-md transition-shadow overflow-hidden">
-                <div className="flex flex-col sm:flex-row h-full">
+                <div className="flex h-full">
                   {/* Lateral Photo */}
-                  <div className="w-full sm:w-28 bg-primary/5 flex-shrink-0 border-b sm:border-b-0 sm:border-r border-border relative overflow-hidden flex items-center justify-center">
+                  <div className="w-20 sm:w-28 bg-primary/5 flex-shrink-0 border-r border-border relative overflow-hidden flex items-center justify-center">
                     {a?.fotoUrl ? (
                       <img src={a.fotoUrl} alt={a.nomeCompleto} className="w-full h-full object-cover" />
                     ) : (
                       <div className="flex flex-col items-center gap-1 text-primary/40">
-                        <Users className="w-8 h-8" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">
+                        <Users className="w-6 h-6 sm:w-8 sm:h-8" />
+                        <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-widest">
                           {(a?.nomeCompleto ?? '?')?.[0]?.toUpperCase?.() ?? '?'}
                         </span>
                       </div>
                     )}
                   </div>
 
-                  <CardContent className="flex-1 p-4">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <p className="font-display font-bold text-lg tracking-tight">{a?.nomeCompleto ?? ''}</p>
-                          <Badge variant={a?.ativo ? 'default' : 'secondary'} className="text-[10px] h-5">
+                  <CardContent className="flex-1 p-3 sm:p-4 min-w-0">
+                    <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
+                      <div className="space-y-1 min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-display font-bold text-base sm:text-lg tracking-tight truncate">{a?.nomeCompleto ?? ''}</p>
+                          <Badge variant={a?.ativo ? 'default' : 'secondary'} className="text-[9px] h-4 sm:h-5">
                             {a?.ativo ? 'Ativo' : 'Arquivado'}
                           </Badge>
                         </div>
-                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                          {a?.sexo ? <span className="flex items-center gap-1">{a.sexo}</span> : null}
-                          {a?.telefone ? <span className="flex items-center gap-1">{a.telefone}</span> : null}
-                          {a?.bairro ? <span className="flex items-center gap-1">{a.bairro}</span> : null}
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] sm:text-xs text-muted-foreground">
+                          {a?.sexo ? <span>{a.sexo}</span> : null}
+                          {a?.telefone ? <span className="truncate">{a.telefone}</span> : null}
+                          {a?.bairro ? <span className="truncate">{a.bairro}</span> : null}
                         </div>
                         
                         {(a?.matriculas?.length ?? 0) > 0 && (
-                          <div className="flex flex-wrap gap-1.5 pt-2">
+                          <div className="flex flex-wrap gap-1 pt-1">
                             {a?.matriculas?.map?.((m: any) => (
                               <Link key={m?.id} href={`/cursos/${m?.curso?.id}`}>
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
-                                  <GraduationCap className="w-3 h-3" />
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+                                  <GraduationCap className="w-2.5 h-2.5" />
                                   {m?.curso?.nome ?? ''}
                                 </span>
                               </Link>
@@ -249,25 +249,25 @@ export default function AlunosPage() {
                         )}
                       </div>
 
-                      <div className="flex items-center gap-1 self-end sm:self-center">
-                        <Button variant="ghost" size="icon" className="relative h-9 w-9" onClick={() => openDocModal(a)} title="Anexar Documentos">
-                          <FolderPlus className="w-4 h-4 text-purple-600" />
+                      <div className="flex items-center gap-0.5 sm:gap-1 flex-wrap sm:flex-nowrap">
+                        <Button variant="ghost" size="icon" className="relative h-8 w-8 sm:h-9 sm:w-9" onClick={() => openDocModal(a)} title="Anexar Documentos">
+                          <FolderPlus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />
                           {(a?._count?.documentos ?? 0) > 0 && (
-                            <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-[9px] font-bold text-white shadow-sm">
+                            <span className="absolute top-0 right-0 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-purple-600 text-[8px] font-bold text-white shadow-sm">
                               {a._count.documentos}
                             </span>
                           )}
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => { setSelectedAluno(a); setIsModalOpen(true); }} title="Oficinas">
-                          <BookOpen className="w-4 h-4 text-blue-600" />
+                        <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" onClick={() => { setSelectedAluno(a); setIsModalOpen(true); }} title="Oficinas">
+                          <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
                         </Button>
-                        <Link href={`/alunos/${a?.id}`}><Button variant="ghost" size="icon" className="h-9 w-9" title="Ver Detalhes"><Eye className="w-4 h-4" /></Button></Link>
-                        <Link href={`/alunos/${a?.id}/editar`}><Button variant="ghost" size="icon" className="h-9 w-9" title="Editar"><Pencil className="w-4 h-4" /></Button></Link>
-                        <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => toggleAtivo(a)} title={a?.ativo ? 'Arquivar' : 'Desarquivar'}>
-                          {a?.ativo ? <UserX className="w-4 h-4 text-orange-500" /> : <UserCheck className="w-4 h-4 text-green-600" />}
+                        <Link href={`/alunos/${a?.id}`}><Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" title="Ver Detalhes"><Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></Button></Link>
+                        <Link href={`/alunos/${a?.id}/editar`}><Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" title="Editar"><Pencil className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></Button></Link>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" onClick={() => toggleAtivo(a)} title={a?.ativo ? 'Arquivar' : 'Desarquivar'}>
+                          {a?.ativo ? <UserX className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-500" /> : <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600" />}
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => deleteAluno(a?.id)} title="Excluir Permanentemente">
-                          <Trash2 className="w-4 h-4 text-destructive" />
+                        <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" onClick={() => deleteAluno(a?.id)} title="Excluir Permanentemente">
+                          <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-destructive" />
                         </Button>
                       </div>
                     </div>
