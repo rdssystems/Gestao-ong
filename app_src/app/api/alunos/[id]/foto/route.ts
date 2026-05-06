@@ -24,7 +24,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     // Generate unique filename
     const uniqueFilename = `foto-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
     const filePath = join(uploadDir, uniqueFilename);
-    const fileUrl = `/uploads/alunos/${params.id}/${uniqueFilename}`;
+    const fileUrl = `/api/servir-arquivo/alunos/${params.id}/${uniqueFilename}`;
 
     await writeFile(filePath, buffer);
     const { chmod } = await import('fs/promises');
