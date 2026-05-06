@@ -19,6 +19,8 @@ services:
       context: ./app_src
       target: runner
     restart: always
+    volumes:
+      - uploads_data:/app/public/uploads
     ports:
       - "3005:3000"
     environment:
@@ -33,3 +35,4 @@ services:
 
 volumes:
   pgdata:
+  uploads_data:
