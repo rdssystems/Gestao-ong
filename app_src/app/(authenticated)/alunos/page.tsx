@@ -204,34 +204,42 @@ export default function AlunosPage() {
         <div className="space-y-3">
           {alunos?.map?.((a: any, i: number) => (
             <motion.div key={a?.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
-              <Card className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center flex-shrink-0 overflow-hidden">
-                        {a?.fotoUrl ? (
-                          <img src={a.fotoUrl} alt={a.nomeCompleto} className="w-full h-full object-cover" />
-                        ) : (
-                          (a?.nomeCompleto ?? '?')?.[0]?.toUpperCase?.() ?? '?'
-                        )}
+              <Card className="hover:shadow-md transition-shadow overflow-hidden">
+                <div className="flex flex-col sm:flex-row h-full">
+                  {/* Lateral Photo */}
+                  <div className="w-full sm:w-28 bg-primary/5 flex-shrink-0 border-b sm:border-b-0 sm:border-r border-border relative overflow-hidden flex items-center justify-center">
+                    {a?.fotoUrl ? (
+                      <img src={a.fotoUrl} alt={a.nomeCompleto} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="flex flex-col items-center gap-1 text-primary/40">
+                        <Users className="w-8 h-8" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">
+                          {(a?.nomeCompleto ?? '?')?.[0]?.toUpperCase?.() ?? '?'}
+                        </span>
                       </div>
-                      <div>
+                    )}
+                  </div>
+
+                  <CardContent className="flex-1 p-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium">{a?.nomeCompleto ?? ''}</p>
-                          <Badge variant={a?.ativo ? 'default' : 'secondary'} className="text-xs">
+                          <p className="font-display font-bold text-lg tracking-tight">{a?.nomeCompleto ?? ''}</p>
+                          <Badge variant={a?.ativo ? 'default' : 'secondary'} className="text-[10px] h-5">
                             {a?.ativo ? 'Ativo' : 'Arquivado'}
                           </Badge>
                         </div>
-                        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mt-1">
-                          {a?.sexo ? <span>{a.sexo}</span> : null}
-                          {a?.nomeMae ? <span>Resp: {a.nomeMae}</span> : null}
-                          {a?.telefone ? <span>{a.telefone}</span> : null}
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                          {a?.sexo ? <span className="flex items-center gap-1">{a.sexo}</span> : null}
+                          {a?.telefone ? <span className="flex items-center gap-1">{a.telefone}</span> : null}
+                          {a?.bairro ? <span className="flex items-center gap-1">{a.bairro}</span> : null}
                         </div>
+                        
                         {(a?.matriculas?.length ?? 0) > 0 && (
-                          <div className="flex flex-wrap gap-1.5 mt-1.5">
+                          <div className="flex flex-wrap gap-1.5 pt-2">
                             {a?.matriculas?.map?.((m: any) => (
                               <Link key={m?.id} href={`/cursos/${m?.curso?.id}`}>
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 hover:bg-emerald-200 transition-colors">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
                                   <GraduationCap className="w-3 h-3" />
                                   {m?.curso?.nome ?? ''}
                                 </span>
@@ -239,40 +247,32 @@ export default function AlunosPage() {
                             ))}
                           </div>
                         )}
-                        {(a?.interesses?.length ?? 0) > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {a?.interesses?.map?.((int: any) => (
-                              <span key={int?.id} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs" style={{ backgroundColor: (int?.tipoCurso?.cor ?? '#14b8a6') + '20', color: int?.tipoCurso?.cor ?? '#14b8a6' }}>
-                                {int?.tipoCurso?.nome ?? ''}
-                              </span>
-                            ))}
-                          </div>
-                        )}
+                      </div>
+
+                      <div className="flex items-center gap-1 self-end sm:self-center">
+                        <Button variant="ghost" size="icon" className="relative h-9 w-9" onClick={() => openDocModal(a)} title="Anexar Documentos">
+                          <FolderPlus className="w-4 h-4 text-purple-600" />
+                          {(a?._count?.documentos ?? 0) > 0 && (
+                            <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-[9px] font-bold text-white shadow-sm">
+                              {a._count.documentos}
+                            </span>
+                          )}
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => { setSelectedAluno(a); setIsModalOpen(true); }} title="Oficinas">
+                          <BookOpen className="w-4 h-4 text-blue-600" />
+                        </Button>
+                        <Link href={`/alunos/${a?.id}`}><Button variant="ghost" size="icon" className="h-9 w-9" title="Ver Detalhes"><Eye className="w-4 h-4" /></Button></Link>
+                        <Link href={`/alunos/${a?.id}/editar`}><Button variant="ghost" size="icon" className="h-9 w-9" title="Editar"><Pencil className="w-4 h-4" /></Button></Link>
+                        <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => toggleAtivo(a)} title={a?.ativo ? 'Arquivar' : 'Desarquivar'}>
+                          {a?.ativo ? <UserX className="w-4 h-4 text-orange-500" /> : <UserCheck className="w-4 h-4 text-green-600" />}
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => deleteAluno(a?.id)} title="Excluir Permanentemente">
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="icon" className="relative" onClick={() => openDocModal(a)} title="Anexar Documentos">
-                        <FolderPlus className="w-4 h-4 text-purple-600" />
-                        {(a?._count?.documentos ?? 0) > 0 && (
-                          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white shadow-sm">
-                            {a._count.documentos}
-                          </span>
-                        )}
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => { setSelectedAluno(a); setIsModalOpen(true); }} title="Oficinas">
-                        <BookOpen className="w-4 h-4 text-blue-600" />
-                      </Button>
-                      <Link href={`/alunos/${a?.id}`}><Button variant="ghost" size="icon" title="Ver Detalhes"><Eye className="w-4 h-4" /></Button></Link>
-                      <Link href={`/alunos/${a?.id}/editar`}><Button variant="ghost" size="icon" title="Editar"><Pencil className="w-4 h-4" /></Button></Link>
-                      <Button variant="ghost" size="icon" onClick={() => toggleAtivo(a)} title={a?.ativo ? 'Arquivar' : 'Desarquivar'}>
-                        {a?.ativo ? <UserX className="w-4 h-4 text-orange-500" /> : <UserCheck className="w-4 h-4 text-green-600" />}
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => deleteAluno(a?.id)} title="Excluir Permanentemente">
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
+                  </CardContent>
+                </div>
               </Card>
             </motion.div>
           )) ?? null}
