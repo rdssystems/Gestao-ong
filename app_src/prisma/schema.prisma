@@ -1,0 +1,149 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String   @unique
+  password      String
+  role          String   @default("admin")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model TipoCurso {
+  id        String   @id @default(cuid())
+  nome      String   @unique
+  descricao String?
+  cor       String   @default("#14b8a6")
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cursos    Curso[]
+  alunoInteresses AlunoInteresse[]
+}
+
+model Aluno {
+  id              String   @id @default(cuid())
+  nomeCompleto    String
+  dataNascimento  DateTime?
+  sexo            String?
+  cpf             String?  @unique
+  rg              String?
+  tipoDocumento   String?
+  numeroDocumento String?
+  numeroCertidao  String?
+  telefone        String?
+  whatsapp        String?
+  email           String?
+  fotoUrl         String?
+  nomeMae         String?
+  cep             String?
+  endereco        String?
+  numero          String?
+  complemento     String?
+  bairro          String?
+  cidade          String?
+  escolaridade    String?
+  observacoes     String?
+  ativo           Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  matriculas      Matricula[]
+  interesses      AlunoInteresse[]
+  presencas       Presenca[]
+  documentos      Documento[]
+
+  @@index([ativo])
+  @@index([nomeCompleto])
+}
+
+model AlunoInteresse {
+  id          String    @id @default(cuid())
+  alunoId     String
+  tipoCursoId String
+  aluno       Aluno     @relation(fields: [alunoId], references: [id])
+  tipoCurso   TipoCurso @relation(fields: [tipoCursoId], references: [id])
+  createdAt   DateTime  @default(now())
+
+  @@unique([alunoId, tipoCursoId])
+}
+
+model Curso {
+  id            String   @id @default(cuid())
+  nome          String
+  tipoCursoId   String
+  tipoCurso     TipoCurso @relation(fields: [tipoCursoId], references: [id])
+  cargaHoraria  Int      @default(0)
+  vagas         Int      @default(0)
+  vagasOcupadas Int      @default(0)
+  dataInicio    DateTime?
+  dataFim       DateTime?
+  turno         String?
+  diasSemana    String?
+  horarioInicio String?
+  horarioFim    String?
+  professor     String?
+  status        String   @default("Inscrições Abertas")
+  ativo         Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  matriculas    Matricula[]
+  presencas     Presenca[]
+
+  @@index([ativo])
+  @@index([status])
+  @@index([tipoCursoId])
+}
+
+model Matricula {
+  id              String   @id @default(cuid())
+  alunoId         String
+  cursoId         String
+  aluno           Aluno    @relation(fields: [alunoId], references: [id])
+  curso           Curso    @relation(fields: [cursoId], references: [id])
+  dataMatricula   DateTime @default(now())
+  status          String   @default("Ativa")
+  observacoes     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([alunoId, cursoId])
+  @@index([status])
+  @@index([alunoId])
+  @@index([cursoId])
+}
+
+model Presenca {
+  id        String   @id @default(cuid())
+  data      DateTime @default(now())
+  status    String   // P, A, J
+  alunoId   String
+  cursoId   String
+  aluno     Aluno    @relation(fields: [alunoId], references: [id])
+  curso     Curso    @relation(fields: [cursoId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([data])
+  @@index([cursoId])
+  @@index([alunoId])
+}
+
+model Documento {
+  id        String   @id @default(cuid())
+  nome      String
+  url       String
+  tipo      String
+  alunoId   String
+  aluno     Aluno    @relation(fields: [alunoId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([alunoId])
+}
