@@ -35,6 +35,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
     return NextResponse.json({ success: true, fotoUrl: fileUrl }, { status: 200 });
   } catch (error: any) {
+    console.error('Erro no upload de foto:', error);
     return NextResponse.json({ error: error.message, stack: error.stack }, { status: 500 });
   }
 }
