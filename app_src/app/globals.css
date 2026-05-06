@@ -13,11 +13,11 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
 
-    --primary: 166 72% 40%;
+    --primary: 187 90% 42%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 166 30% 95%;
-    --secondary-foreground: 166 50% 20%;
+    --secondary: 187 30% 95%;
+    --secondary-foreground: 187 50% 20%;
 
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
@@ -30,7 +30,7 @@
 
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 166 72% 40%;
+    --ring: 187 90% 42%;
 
     --radius: 0.625rem;
     --radius-sm: calc(0.625rem - 4px);
@@ -70,7 +70,7 @@
     --popover: 240 10% 5.9%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 166 72% 45%;
+    --primary: 187 90% 50%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 240 3.7% 15.9%;
@@ -87,7 +87,7 @@
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 166 72% 45%;
+    --ring: 187 90% 50%;
 
     --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.15), 0 1px 2px -1px rgb(0 0 0 / 0.15);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.15);
