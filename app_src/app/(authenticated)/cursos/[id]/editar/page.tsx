@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Pencil } from 'lucide-react';
+import { toast } from 'sonner';
 import { CursoForm } from '@/components/curso-form';
 import { PageHeader } from '@/components/page-header';
 
@@ -14,14 +15,24 @@ export default function EditarCursoPage() {
   useEffect(() => {
     if (!params?.id) return;
     fetch(`/api/cursos/${params.id}`)
-      .then((r: any) => r?.json?.())
-      .then((d: any) => setCurso(d ?? null))
-      .catch(() => {})
+      .then((r: any) => r.json())
+      .then((d: any) => {
+        if (d && !d.error) {
+          setCurso(d);
+        } else {
+          setCurso(null);
+          if (d?.error) toast.error(d.error);
+        }
+      })
+      .catch(() => {
+        setCurso(null);
+        toast.error('Erro ao carregar dados da oficina');
+      })
       .finally(() => setLoading(false));
   }, [params?.id]);
 
   if (loading) return <div className="h-32 bg-muted animate-pulse rounded-xl" />;
-  if (!curso) return <div className="text-center py-16 text-muted-foreground">Oficina não encontrada</div>;
+  if (!curso || curso.error) return <div className="text-center py-16 text-muted-foreground">Oficina não encontrada</div>;
 
   return (
     <div className="space-y-6">

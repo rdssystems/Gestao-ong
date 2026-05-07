@@ -29,6 +29,7 @@ export default function AlunosPage() {
   const [isDocModalOpen, setIsDocModalOpen] = useState(false);
   const [isToggling, setIsToggling] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [previewDoc, setPreviewDoc] = useState<any>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -295,7 +296,7 @@ export default function AlunosPage() {
             <DialogDescription className="sr-only">Gerencie as oficinas nas quais este aluno está matriculado.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
-            {cursos.length === 0 ? (
+            {!Array.isArray(cursos) || cursos.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center">Nenhuma oficina disponível.</p>
             ) : (
               cursos.map(curso => {
@@ -384,7 +385,22 @@ export default function AlunosPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
-                      <a href={doc.url} target="_blank" rel="noopener noreferrer">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-blue-600" 
+                        onClick={() => {
+                          if (doc.tipo.includes('pdf')) {
+                            window.open(doc.url, '_blank');
+                          } else {
+                            setPreviewDoc(doc);
+                          }
+                        }}
+                        title="Visualizar"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      <a href={doc.url} download={doc.nome} target="_blank" rel="noopener noreferrer">
                         <Button variant="ghost" size="icon" className="h-8 w-8"><Download className="w-4 h-4" /></Button>
                       </a>
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDeleteDoc(doc.id)}>
@@ -394,6 +410,22 @@ export default function AlunosPage() {
                   </div>
                 ))
               )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={!!previewDoc} onOpenChange={() => setPreviewDoc(null)}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-1 overflow-hidden bg-transparent border-none">
+          <DialogTitle className="sr-only">Visualização de Documento</DialogTitle>
+          <div className="relative w-full h-full flex items-center justify-center">
+            <img 
+              src={previewDoc?.url} 
+              alt={previewDoc?.nome} 
+              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+            />
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-md px-4 py-2 rounded-full text-white text-sm font-medium">
+              {previewDoc?.nome}
             </div>
           </div>
         </DialogContent>

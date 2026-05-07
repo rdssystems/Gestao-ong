@@ -244,37 +244,52 @@ export default function CursosPage() {
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="grid grid-cols-2 sm:flex items-center gap-1.5 sm:gap-2 flex-shrink-0 w-full sm:w-auto">
                         {tab !== 'arquivadas' && (
-                          <Select
-                            value={c?.status ?? ''}
-                            onValueChange={(v: string) => updateStatus(c?.id, v)}
-                          >
-                            <SelectTrigger className="w-44 h-8 text-xs">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {statusOptions.map((s: string) => (
-                                <SelectItem key={s} value={s}>{s}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <div className="col-span-2 sm:col-span-1">
+                            <Select
+                              value={c?.status ?? ''}
+                              onValueChange={(v: string) => updateStatus(c?.id, v)}
+                            >
+                              <SelectTrigger className="w-full sm:w-32 h-8 text-[10px] sm:text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {statusOptions.map((s: string) => (
+                                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
                         )}
-                        <Link href={`/cursos/${c?.id}`}><Button variant="ghost" size="icon" title="Visualizar"><Eye className="w-4 h-4" /></Button></Link>
+                        <Link href={`/cursos/${c?.id}`} className="flex-1 sm:flex-none">
+                          <Button variant="outline" size="sm" className="w-full sm:w-8 h-8 p-0" title="Visualizar">
+                            <Eye className="w-3.5 h-3.5" />
+                            <span className="sm:hidden ml-2 text-[10px]">Ver</span>
+                          </Button>
+                        </Link>
                         {tab !== 'arquivadas' && (
-                          <Link href={`/cursos/${c?.id}/editar`}><Button variant="ghost" size="icon" title="Editar"><Pencil className="w-4 h-4" /></Button></Link>
+                          <Link href={`/cursos/${c?.id}/editar`} className="flex-1 sm:flex-none">
+                            <Button variant="outline" size="sm" className="w-full sm:w-8 h-8 p-0" title="Editar">
+                              <Pencil className="w-3.5 h-3.5" />
+                              <span className="sm:hidden ml-2 text-[10px]">Editar</span>
+                            </Button>
+                          </Link>
                         )}
                         {tab === 'arquivadas' ? (
-                          <Button variant="ghost" size="icon" onClick={() => restaurarOficina(c)} title="Restaurar oficina">
-                            <RotateCcw className="w-4 h-4 text-green-600" />
+                          <Button variant="outline" size="sm" className="w-full sm:w-8 h-8 p-0" onClick={() => restaurarOficina(c)} title="Restaurar oficina">
+                            <RotateCcw className="w-3.5 h-3.5 text-green-600" />
+                            <span className="sm:hidden ml-2 text-[10px]">Restaurar</span>
                           </Button>
                         ) : (
-                          <Button variant="ghost" size="icon" onClick={() => arquivarOficina(c)} title="Arquivar oficina">
-                            <Archive className="w-4 h-4 text-amber-600" />
+                          <Button variant="outline" size="sm" className="w-full sm:w-8 h-8 p-0" onClick={() => arquivarOficina(c)} title="Arquivar oficina">
+                            <Archive className="w-3.5 h-3.5 text-amber-600" />
+                            <span className="sm:hidden ml-2 text-[10px]">Arquivar</span>
                           </Button>
                         )}
-                        <Button variant="ghost" size="icon" onClick={() => excluirOficina(c)} title="Excluir oficina permanentemente">
-                          <Trash2 className="w-4 h-4 text-destructive" />
+                        <Button variant="outline" size="sm" className="w-full sm:w-8 h-8 p-0 hover:bg-destructive/10 hover:text-destructive" onClick={() => excluirOficina(c)} title="Excluir oficina permanentemente">
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span className="sm:hidden ml-2 text-[10px]">Excluir</span>
                         </Button>
                       </div>
                     </div>

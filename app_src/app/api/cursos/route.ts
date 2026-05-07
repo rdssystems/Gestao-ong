@@ -54,13 +54,15 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { nome, tipoCursoId, cargaHoraria, vagas, dataInicio, dataFim, turno, diasSemana, horarioInicio, horarioFim, professor, status } = body ?? {};
+    const { nome, tipoCursoId, cargaHoraria, vagas, dataInicio, dataFim, turno, diasSemana, horarioInicio, horarioFim, professor, status, temMensalidade, valorMensalidade } = body ?? {};
     if (!nome || !tipoCursoId) return NextResponse.json({ error: 'Nome e tipo de curso são obrigatórios' }, { status: 400 });
 
     const curso = await prisma.curso.create({
       data: {
         nome,
-        tipoCursoId,
+        tipoCurso: {
+          connect: { id: tipoCursoId }
+        },
         cargaHoraria: parseInt(String(cargaHoraria ?? 0)),
         vagas: parseInt(String(vagas ?? 0)),
         dataInicio: dataInicio ? new Date(dataInicio) : null,
@@ -71,6 +73,8 @@ export async function POST(req: Request) {
         horarioFim: horarioFim ?? null,
         professor: professor ?? null,
         status: status ?? 'Inscrições Abertas',
+        temMensalidade: Boolean(temMensalidade),
+        valorMensalidade: valorMensalidade ? parseFloat(String(valorMensalidade)) : null,
       },
       include: { tipoCurso: true },
     });

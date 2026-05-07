@@ -38,5 +38,5 @@ COPY --from=builder /app/next.config.js ./
 RUN mkdir -p public/uploads && chown -R nextjs:nodejs public/uploads
 
 # Ensure the user has permissions to the volume at runtime
-CMD ["sh", "-c", "mkdir -p public/uploads && chown -R nextjs:nodejs public/uploads && npx prisma migrate deploy && npm start"]
+CMD ["sh", "-c", "mkdir -p public/uploads && chown -R nextjs:nodejs public/uploads && npx prisma db push && npm start"]
 

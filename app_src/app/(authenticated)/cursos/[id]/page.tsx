@@ -2,10 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { BookOpen, ArrowLeft, Pencil, Clock, Users, Calendar, MapPin, ClipboardList, Eye } from 'lucide-react';
+import { BookOpen, ArrowLeft, Pencil, Clock, Users, Calendar, MapPin, ClipboardList, Eye, CircleDollarSign, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import Link from 'next/link';
@@ -17,6 +21,17 @@ export default function CursoDetailPage() {
   const [curso, setCurso] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  // Payment Modal State
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [selectedMatricula, setSelectedMatricula] = useState<any>(null);
+  const [savingPayment, setSavingPayment] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({
+    mes: new Date().getMonth() + 1,
+    ano: new Date().getFullYear(),
+    valor: '',
+    formaPagamento: 'Dinheiro',
+  });
+
   useEffect(() => {
     if (!params?.id) return;
     fetch(`/api/cursos/${params.id}`)
@@ -25,6 +40,40 @@ export default function CursoDetailPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [params?.id]);
+
+  const handleSavePayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedMatricula) return;
+    setSavingPayment(true);
+    try {
+      const res = await fetch('/api/pagamentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          matriculaId: selectedMatricula.id,
+          cursoId: curso.id,
+          alunoId: selectedMatricula.alunoId,
+          mesReferencia: paymentForm.mes,
+          anoReferencia: paymentForm.ano,
+          valorPago: paymentForm.valor,
+          formaPagamento: paymentForm.formaPagamento,
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erro ao registrar pagamento');
+      toast.success('Pagamento registrado com sucesso!');
+      setIsPaymentModalOpen(false);
+      
+      // Refresh curso data
+      const refreshRes = await fetch(`/api/cursos/${curso.id}`);
+      const refreshData = await refreshRes.json();
+      setCurso(refreshData);
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setSavingPayment(false);
+    }
+  };
 
   if (loading) return <div className="space-y-4">{[1,2].map((i: number) => <div key={i} className="h-32 bg-muted animate-pulse rounded-xl" />)}</div>;
   if (!curso) return <div className="text-center py-16 text-muted-foreground">Oficina não encontrada</div>;
@@ -113,21 +162,149 @@ export default function CursoDetailPage() {
             <p className="text-sm text-muted-foreground">Nenhum aluno matriculado</p>
           ) : (
             <div className="space-y-2">
-              {curso?.matriculas?.map?.((m: any) => (
-                <Link key={m?.id} href={`/alunos/${m?.aluno?.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center">
-                      {(m?.aluno?.nomeCompleto ?? '?')?.[0]?.toUpperCase?.() ?? '?'}
+              {curso?.matriculas?.map?.((m: any) => {
+                const pagamentosAluno = curso?.pagamentos?.filter((p: any) => p.matriculaId === m.id) || [];
+                const currentMonthPayment = pagamentosAluno.find((p: any) => p.mesReferencia === (new Date().getMonth() + 1) && p.anoReferencia === new Date().getFullYear());
+                
+                return (
+                  <div key={m?.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors border border-transparent hover:border-border gap-3">
+                    <Link href={`/alunos/${m?.aluno?.id}`} className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center flex-shrink-0">
+                        {(m?.aluno?.nomeCompleto ?? '?')?.[0]?.toUpperCase?.() ?? '?'}
+                      </div>
+                      <p className="text-sm font-medium truncate">{m?.aluno?.nomeCompleto ?? ''}</p>
+                    </Link>
+                    <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap flex-shrink-0">
+                      <Badge variant={m?.status === 'Ativa' ? 'default' : 'secondary'}>{m?.status ?? ''}</Badge>
+                      
+                      {curso?.temMensalidade && (
+                        <>
+                          <Badge variant={currentMonthPayment ? 'default' : 'destructive'} className="text-[10px]">
+                            {currentMonthPayment ? 'Mês Pago' : 'Mês Pendente'}
+                          </Badge>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="h-7 text-xs px-2"
+                            onClick={() => {
+                              setSelectedMatricula(m);
+                              setPaymentForm({
+                                ...paymentForm,
+                                mes: new Date().getMonth() + 1,
+                                ano: new Date().getFullYear(),
+                                valor: curso.valorMensalidade ? String(curso.valorMensalidade) : '',
+                              });
+                              setIsPaymentModalOpen(true);
+                            }}
+                          >
+                            <CircleDollarSign className="w-3.5 h-3.5 mr-1 text-green-600" />
+                            Receber
+                          </Button>
+                        </>
+                      )}
                     </div>
-                    <p className="text-sm font-medium">{m?.aluno?.nomeCompleto ?? ''}</p>
                   </div>
-                  <Badge variant={m?.status === 'Ativa' ? 'default' : 'secondary'}>{m?.status ?? ''}</Badge>
-                </Link>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
       </Card>
+
+      {/* Payment Modal */}
+      {isPaymentModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-background rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="font-bold text-lg flex items-center gap-2">
+                <CircleDollarSign className="w-5 h-5 text-green-600" /> Registrar Pagamento
+              </h3>
+              <Button variant="ghost" size="icon" onClick={() => setIsPaymentModalOpen(false)}><X className="w-4 h-4" /></Button>
+            </div>
+            
+            <div className="p-4 bg-muted/30 border-b">
+              <p className="text-sm text-muted-foreground">Aluno</p>
+              <p className="font-semibold">{selectedMatricula?.aluno?.nomeCompleto}</p>
+            </div>
+
+            {/* Check for existing payment */}
+            {(() => {
+              const existing = curso?.pagamentos?.find((p: any) => 
+                p.matriculaId === selectedMatricula?.id && 
+                p.mesReferencia === paymentForm.mes && 
+                p.anoReferencia === paymentForm.ano
+              );
+              if (existing) {
+                return (
+                  <div className="mx-4 mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
+                    <div className="p-1 bg-amber-100 rounded-full">
+                      <Clock className="w-3.5 h-3.5 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-amber-800">Pagamento já registrado</p>
+                      <p className="text-[10px] text-amber-700">Já existe um lançamento para este mês. Você ainda pode realizar outro lançamento se necessário.</p>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+
+            <form onSubmit={handleSavePayment} className="p-4 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Mês Referência</Label>
+                  <Select value={String(paymentForm.mes)} onValueChange={(v) => setPaymentForm({...paymentForm, mes: parseInt(v)})}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: 12 }).map((_, i) => (
+                        <SelectItem key={i+1} value={String(i+1)}>{new Date(2000, i).toLocaleString('pt-BR', { month: 'long' })}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Ano</Label>
+                  <Input type="number" value={paymentForm.ano} onChange={(e) => setPaymentForm({...paymentForm, ano: parseInt(e.target.value)})} />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Valor Pago (R$)</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">R$</span>
+                  <Input 
+                    type="number" step="0.01" min="0.01" required className="pl-9"
+                    value={paymentForm.valor} onChange={(e) => setPaymentForm({...paymentForm, valor: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Forma de Pagamento</Label>
+                <Select value={paymentForm.formaPagamento} onValueChange={(v) => setPaymentForm({...paymentForm, formaPagamento: v})}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Dinheiro">Dinheiro</SelectItem>
+                    <SelectItem value="Pix">Pix</SelectItem>
+                    <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
+                    <SelectItem value="Cartão de Débito">Cartão de Débito</SelectItem>
+                    <SelectItem value="Transferência">Transferência</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="pt-4 flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => setIsPaymentModalOpen(false)}>Cancelar</Button>
+                <Button type="submit" disabled={savingPayment} className="bg-green-600 hover:bg-green-700 text-white">
+                  {savingPayment ? 'Salvando...' : 'Confirmar Recebimento'}
+                </Button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -36,6 +36,8 @@ export function CursoForm({ initialData, isEdit }: CursoFormProps) {
     diasSemana: '',
     professor: '',
     status: 'Inscrições Abertas',
+    temMensalidade: false,
+    valorMensalidade: '',
   });
 
   useEffect(() => {
@@ -60,6 +62,8 @@ export function CursoForm({ initialData, isEdit }: CursoFormProps) {
         diasSemana: initialData?.diasSemana ?? '',
         professor: initialData?.professor ?? '',
         status: initialData?.status ?? 'Inscrições Abertas',
+        temMensalidade: Boolean(initialData?.temMensalidade),
+        valorMensalidade: initialData?.valorMensalidade ? String(initialData.valorMensalidade) : '',
       });
     }
   }, [initialData]);
@@ -85,6 +89,8 @@ export function CursoForm({ initialData, isEdit }: CursoFormProps) {
         turno: form?.turno || null,
         horarioInicio: form?.horarioInicio || null,
         horarioFim: form?.horarioFim || null,
+        temMensalidade: form?.temMensalidade,
+        valorMensalidade: form?.valorMensalidade ? parseFloat(form.valorMensalidade) : null,
       };
       const res = await fetch(url, {
         method,
@@ -179,6 +185,41 @@ export function CursoForm({ initialData, isEdit }: CursoFormProps) {
             <Label>Professor</Label>
             <Input value={form?.professor ?? ''} onChange={(e: any) => handleChange('professor', e?.target?.value ?? '')} placeholder="Nome do professor" />
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle>Informações Financeiras</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2 flex flex-col justify-center">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input 
+                type="checkbox" 
+                className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+                checked={form.temMensalidade}
+                onChange={(e) => handleChange('temMensalidade', e.target.checked as any)}
+              />
+              <span className="font-medium text-sm">Possui Mensalidade?</span>
+            </label>
+            <p className="text-xs text-muted-foreground ml-8">Ative se os alunos desta oficina precisarem pagar mensalidade.</p>
+          </div>
+          {form.temMensalidade && (
+            <div className="space-y-2">
+              <Label>Valor Padrão da Mensalidade (R$)</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">R$</span>
+                <Input 
+                  type="number" 
+                  step="0.01" 
+                  min="0"
+                  className="pl-9"
+                  value={form?.valorMensalidade ?? ''} 
+                  onChange={(e: any) => handleChange('valorMensalidade', e?.target?.value ?? '')} 
+                  placeholder="0.00" 
+                />
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

@@ -59,6 +59,7 @@ model Aluno {
   interesses      AlunoInteresse[]
   presencas       Presenca[]
   documentos      Documento[]
+  pagamentos      PagamentoMensalidade[]
 
   @@index([ativo])
   @@index([nomeCompleto])
@@ -92,10 +93,13 @@ model Curso {
   professor     String?
   status        String   @default("Inscrições Abertas")
   ativo         Boolean  @default(true)
+  temMensalidade   Boolean  @default(false)
+  valorMensalidade Float?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   matriculas    Matricula[]
   presencas     Presenca[]
+  pagamentos    PagamentoMensalidade[]
 
   @@index([ativo])
   @@index([status])
@@ -113,6 +117,7 @@ model Matricula {
   observacoes     String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  pagamentos      PagamentoMensalidade[]
 
   @@unique([alunoId, cursoId])
   @@index([status])
@@ -146,4 +151,28 @@ model Documento {
   createdAt DateTime @default(now())
 
   @@index([alunoId])
+}
+
+model PagamentoMensalidade {
+  id              String    @id @default(cuid())
+  matriculaId     String
+  cursoId         String
+  alunoId         String
+  mesReferencia   Int       // 1 a 12
+  anoReferencia   Int       // Ex: 2026
+  valorPago       Float
+  dataPagamento   DateTime  @default(now())
+  formaPagamento  String?   // Pix, Dinheiro, Cartão
+  status          String    @default("Pago")
+  
+  matricula       Matricula @relation(fields: [matriculaId], references: [id])
+  curso           Curso     @relation(fields: [cursoId], references: [id])
+  aluno           Aluno     @relation(fields: [alunoId], references: [id])
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([cursoId])
+  @@index([alunoId])
+  @@index([mesReferencia, anoReferencia])
 }

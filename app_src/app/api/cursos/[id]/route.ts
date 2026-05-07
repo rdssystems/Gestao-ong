@@ -10,6 +10,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
       include: {
         tipoCurso: true,
         matriculas: { include: { aluno: true } },
+        pagamentos: true,
       },
     });
     if (!curso) return NextResponse.json({ error: 'Não encontrado' }, { status: 404 });
@@ -21,12 +22,20 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
+    if (params?.id === 'undefined') {
+      return NextResponse.json({ error: 'ID da oficina inválido' }, { status: 400 });
+    }
+
     const body = await req.json();
-    const { nome, tipoCursoId, cargaHoraria, vagas, dataInicio, dataFim, turno, diasSemana, horarioInicio, horarioFim, professor, status, ativo } = body ?? {};
+    const { nome, tipoCursoId, cargaHoraria, vagas, dataInicio, dataFim, turno, diasSemana, horarioInicio, horarioFim, professor, status, ativo, temMensalidade, valorMensalidade } = body ?? {};
 
     const data: any = {};
     if (nome !== undefined) data.nome = nome;
-    if (tipoCursoId !== undefined) data.tipoCursoId = tipoCursoId;
+    if (tipoCursoId !== undefined) {
+      data.tipoCurso = {
+        connect: { id: tipoCursoId }
+      };
+    }
     if (cargaHoraria !== undefined) data.cargaHoraria = parseInt(String(cargaHoraria ?? 0));
     if (vagas !== undefined) data.vagas = parseInt(String(vagas ?? 0));
     if (dataInicio !== undefined) data.dataInicio = dataInicio ? new Date(dataInicio) : null;
@@ -38,6 +47,8 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     if (professor !== undefined) data.professor = professor;
     if (status !== undefined) data.status = status;
     if (ativo !== undefined) data.ativo = ativo;
+    if (temMensalidade !== undefined) data.temMensalidade = Boolean(temMensalidade);
+    if (valorMensalidade !== undefined) data.valorMensalidade = valorMensalidade ? parseFloat(String(valorMensalidade)) : null;
 
     const curso = await prisma.curso.update({
       where: { id: params?.id },

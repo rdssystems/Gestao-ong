@@ -11,6 +11,10 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
         interesses: { include: { tipoCurso: true } },
         matriculas: { include: { curso: { include: { tipoCurso: true } } } },
         documentos: true,
+        pagamentos: {
+          include: { curso: true },
+          orderBy: { dataPagamento: 'desc' }
+        },
       },
     });
     if (!aluno) return NextResponse.json({ error: 'Não encontrado' }, { status: 404 });
