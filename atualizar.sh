@@ -12,12 +12,12 @@ echo "🛠️ Reconstruindo containers..."
 docker compose down
 docker compose up -d --build
 
-# 3. Aplicar migrações do Prisma
-echo "🗄️ Aplicando migrações do banco de dados..."
-docker exec app_ong-app-1 npx prisma migrate deploy
+# 3. Recarregar o Nginx para limpar cache de IP
+echo "🔄 Atualizando rotas do Nginx..."
+docker exec gerenciador-nginx nginx -s reload
 
-# 4. Limpar imagens antigas (opcional, para economizar espaço)
-echo "🧹 Limpando imagens antigas não utilizadas..."
+# 4. Limpar imagens antigas
+echo "🧹 Limpando imagens antigas..."
 docker image prune -f
 
-echo "✅ Atualização concluída com sucesso! O sistema já está rodando a nova versão."
+echo "✅ Sistema atualizado e online em https://gestaobalance.app.br"
