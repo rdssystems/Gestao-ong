@@ -347,68 +347,91 @@ export default function AlunosPage() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             {/* Upload Area */}
-            <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:bg-gray-50 transition-colors relative">
+            <div className="group border-2 border-dashed border-muted-foreground/20 rounded-2xl p-8 text-center hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 relative overflow-hidden">
               <input 
                 type="file" 
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed" 
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10" 
                 onChange={handleUploadDoc}
                 disabled={uploading}
                 accept="image/*,.pdf"
               />
-              <div className="flex flex-col items-center gap-2">
-                {uploading ? (
-                  <Loader2 className="w-8 h-8 text-muted-foreground animate-spin" />
-                ) : (
-                  <FolderPlus className="w-8 h-8 text-muted-foreground" />
-                )}
-                <p className="text-sm font-medium">
-                  {uploading ? 'Enviando documento...' : 'Clique ou arraste um arquivo para anexar'}
-                </p>
-                <p className="text-xs text-muted-foreground">PDFs e Imagens (PNG, JPG)</p>
+              <div className="flex flex-col items-center gap-3 relative z-0">
+                <div className={`p-4 rounded-full ${uploading ? 'bg-muted animate-pulse' : 'bg-primary/10 group-hover:bg-primary/20'} transition-colors`}>
+                  {uploading ? (
+                    <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                  ) : (
+                    <FolderPlus className="w-8 h-8 text-primary" />
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-foreground">
+                    {uploading ? 'Enviando documento...' : 'Clique ou arraste para anexar'}
+                  </p>
+                  <p className="text-xs text-muted-foreground">PDF, PNG ou JPG (máx. 10MB)</p>
+                </div>
               </div>
             </div>
 
             {/* List of Documents */}
             <div className="space-y-2 max-h-[40vh] overflow-y-auto">
               {(selectedAluno?.documentos?.length ?? 0) === 0 ? (
-                <p className="text-sm text-center text-muted-foreground py-4">Nenhum documento anexado ainda.</p>
+                <div className="py-12 text-center space-y-2">
+                  <FileText className="w-10 h-10 text-muted-foreground/20 mx-auto" />
+                  <p className="text-sm text-muted-foreground">Nenhum documento anexado ainda.</p>
+                </div>
               ) : (
-                selectedAluno?.documentos?.map((doc: any) => (
-                  <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:shadow-sm transition-shadow">
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <FileText className="w-4 h-4 text-primary" />
+                <div className="space-y-3">
+                  {selectedAluno?.documentos?.map((doc: any) => (
+                    <div key={doc.id} className="group flex items-center justify-between p-3.5 rounded-2xl border bg-card hover:border-primary/20 hover:shadow-md transition-all duration-300">
+                      <div className="flex items-center gap-3 overflow-hidden min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/10 transition-colors">
+                          <FileText className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0 pr-2">
+                          <p className="text-sm font-bold text-foreground break-all leading-snug" title={doc.nome}>{doc.nome}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider bg-muted px-1.5 py-0.5 rounded">
+                              {doc.tipo.split('/')[1] || 'Doc'}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {new Date(doc.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="truncate">
-                        <p className="text-sm font-medium truncate" title={doc.nome}>{doc.nome}</p>
-                        <p className="text-[10px] text-muted-foreground uppercase">{doc.tipo.split('/')[1] || 'Doc'} • {new Date(doc.createdAt).toLocaleDateString()}</p>
+                      <div className="flex items-center gap-0.5 flex-shrink-0 ml-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-9 w-9 text-blue-600 hover:text-blue-700 hover:bg-blue-50" 
+                          onClick={() => {
+                            if (doc.tipo.includes('pdf')) {
+                              window.open(doc.url, '_blank');
+                            } else {
+                              setPreviewDoc(doc);
+                            }
+                          }}
+                          title="Visualizar"
+                        >
+                          <Eye className="w-4.5 h-4.5" />
+                        </Button>
+                        <a href={doc.url} download={doc.nome} target="_blank" rel="noopener noreferrer">
+                          <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-600 hover:bg-slate-50">
+                            <Download className="w-4.5 h-4.5" />
+                          </Button>
+                        </a>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10" 
+                          onClick={() => handleDeleteDoc(doc.id)}
+                        >
+                          <Trash2 className="w-4.5 h-4.5" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 text-blue-600" 
-                        onClick={() => {
-                          if (doc.tipo.includes('pdf')) {
-                            window.open(doc.url, '_blank');
-                          } else {
-                            setPreviewDoc(doc);
-                          }
-                        }}
-                        title="Visualizar"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <a href={doc.url} download={doc.nome} target="_blank" rel="noopener noreferrer">
-                        <Button variant="ghost" size="icon" className="h-8 w-8"><Download className="w-4 h-4" /></Button>
-                      </a>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDeleteDoc(doc.id)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </div>
           </div>

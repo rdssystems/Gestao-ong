@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { BookOpen, ArrowLeft, Pencil, Clock, Users, Calendar, MapPin, ClipboardList, Eye, CircleDollarSign, X } from 'lucide-react';
+import { BookOpen, ArrowLeft, Pencil, Clock, Users, Calendar, MapPin, ClipboardList, Eye, CircleDollarSign, X, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -72,6 +72,28 @@ export default function CursoDetailPage() {
       toast.error(err.message);
     } finally {
       setSavingPayment(false);
+    }
+  };
+
+  const handleDeleteMatricula = async (matriculaId: string, alunoNome: string) => {
+    if (!confirm(`Tem certeza que deseja remover o aluno ${alunoNome} desta oficina?`)) return;
+    
+    try {
+      const res = await fetch(`/api/matriculas/${matriculaId}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      
+      if (!res.ok) throw new Error(data.error || 'Erro ao remover matrícula');
+      
+      toast.success('Aluno removido com sucesso!');
+      
+      // Refresh curso data
+      const refreshRes = await fetch(`/api/cursos/${curso.id}`);
+      const refreshData = await refreshRes.json();
+      setCurso(refreshData);
+    } catch (err: any) {
+      toast.error(err.message);
     }
   };
 
@@ -202,6 +224,17 @@ export default function CursoDetailPage() {
                           </Button>
                         </>
                       )}
+
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="h-7 px-2 text-destructive hover:text-white hover:bg-destructive transition-colors text-[10px] font-bold gap-1"
+                        onClick={() => handleDeleteMatricula(m.id, m.aluno?.nomeCompleto)}
+                        title="Remover Matrícula"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Remover
+                      </Button>
                     </div>
                   </div>
                 );

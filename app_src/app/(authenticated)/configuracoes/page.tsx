@@ -14,7 +14,11 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) => fetch(url).then(async (res) => {
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Erro na requisição');
+  return data;
+});
 
 const schema = yup.object().shape({
   name: yup.string().required('Nome é obrigatório'),
@@ -188,11 +192,11 @@ export default function ConfiguracoesPage() {
               </div>
             ) : error ? (
               <div className="p-8 text-center text-destructive">Erro ao carregar usuários.</div>
-            ) : users?.length === 0 ? (
+            ) : !Array.isArray(users) || users.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">Nenhum usuário cadastrado.</div>
             ) : (
               <div className="divide-y divide-border">
-                {users?.map((user: any) => (
+                {users.map((user: any) => (
                   <div key={user.id} className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
                     <div>
                       <p className="font-medium text-foreground">{user.name}</p>

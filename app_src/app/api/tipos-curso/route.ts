@@ -17,7 +17,7 @@ export async function GET(req: Request) {
     }
 
     if (all) {
-      const tipos = await prisma.tipoCurso.findMany({ where: { ativo: true }, orderBy: { nome: 'asc' } });
+      const tipos = await prisma.tipoCurso.findMany({ orderBy: { nome: 'asc' } });
       return NextResponse.json(tipos ?? []);
     }
 

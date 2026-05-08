@@ -107,6 +107,29 @@ export default function AlunoDetailPage() {
     }
   };
 
+  const handleDeleteMatricula = async (matriculaId: string, cursoNome: string) => {
+    if (!confirm(`Tem certeza que deseja cancelar a matrícula do aluno na oficina ${cursoNome}?`)) return;
+    
+    try {
+      const res = await fetch(`/api/matriculas/${matriculaId}`, {
+        method: 'DELETE',
+      });
+      
+      if (res.ok) {
+        toast.success('Matrícula cancelada com sucesso!');
+        // Refresh aluno data
+        const updatedRes = await fetch(`/api/alunos/${aluno.id}`);
+        const updatedAluno = await updatedRes.json();
+        setAluno(updatedAluno);
+      } else {
+        const data = await res.json();
+        toast.error(data.error || 'Erro ao cancelar matrícula');
+      }
+    } catch {
+      toast.error('Erro de comunicação com o servidor');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -216,13 +239,24 @@ export default function AlunoDetailPage() {
           <CardContent>
             <div className="space-y-2">
               {aluno?.matriculas?.map?.((m: any) => (
-                <div key={m?.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                  <div>
-                    <p className="font-medium text-sm">{m?.curso?.nome ?? ''}</p>
-                    <p className="text-xs text-muted-foreground">{m?.curso?.tipoCurso?.nome ?? ''}</p>
+                  <div key={m?.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-transparent hover:border-border transition-all">
+                    <div>
+                      <p className="font-medium text-sm">{m?.curso?.nome ?? ''}</p>
+                      <p className="text-xs text-muted-foreground">{m?.curso?.tipoCurso?.nome ?? ''}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={m?.status === 'Ativa' ? 'default' : 'secondary'}>{m?.status ?? ''}</Badge>
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => handleDeleteMatricula(m.id, m.curso?.nome)}
+                        title="Cancelar Matrícula"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <Badge variant={m?.status === 'Ativa' ? 'default' : 'secondary'}>{m?.status ?? ''}</Badge>
-                </div>
               ))}
             </div>
           </CardContent>
@@ -301,25 +335,35 @@ export default function AlunoDetailPage() {
           </CardHeader>
           <CardContent>
             {(aluno?.documentos?.length ?? 0) === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhum documento anexado.</p>
+              <div className="py-12 text-center space-y-2">
+                <FileText className="w-10 h-10 text-muted-foreground/20 mx-auto" />
+                <p className="text-sm text-muted-foreground">Nenhum documento anexado ainda.</p>
+              </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {aluno?.documentos?.map?.((doc: any) => (
-                  <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:shadow-sm transition-shadow">
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <FileText className="w-4 h-4 text-primary" />
+                  <div key={doc.id} className="group flex items-center justify-between p-3.5 rounded-2xl border bg-card hover:border-primary/20 hover:shadow-md transition-all duration-300">
+                    <div className="flex items-center gap-3 overflow-hidden min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/10 transition-colors">
+                        <FileText className="w-5 h-5 text-primary" />
                       </div>
-                      <div className="truncate">
-                        <p className="text-sm font-medium truncate" title={doc.nome}>{doc.nome}</p>
-                        <p className="text-[10px] text-muted-foreground uppercase">{doc.tipo.split('/')[1] || 'Doc'} • {new Date(doc.createdAt).toLocaleDateString()}</p>
+                      <div className="flex-1 min-w-0 pr-2">
+                        <p className="text-sm font-bold text-foreground break-all leading-snug" title={doc.nome}>{doc.nome}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider bg-muted px-1.5 py-0.5 rounded">
+                            {doc.tipo.split('/')[1] || 'Doc'}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground">
+                            {new Date(doc.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                    <div className="flex items-center gap-0.5 flex-shrink-0 ml-2">
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="h-8 w-8 text-blue-600" 
+                        className="h-9 w-9 text-blue-600 hover:text-blue-700 hover:bg-blue-50" 
                         onClick={() => {
                           if (doc.tipo.includes('pdf')) {
                             window.open(doc.url, '_blank');
@@ -329,13 +373,15 @@ export default function AlunoDetailPage() {
                         }}
                         title="Visualizar"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="w-4.5 h-4.5" />
                       </Button>
                       <a href={doc.url} download={doc.nome} target="_blank" rel="noopener noreferrer">
-                        <Button variant="ghost" size="icon" className="h-8 w-8"><Download className="w-4 h-4" /></Button>
+                        <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-600 hover:bg-slate-50">
+                          <Download className="w-4.5 h-4.5" />
+                        </Button>
                       </a>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDeleteDoc(doc.id)}>
-                        <Trash2 className="w-4 h-4" />
+                      <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDeleteDoc(doc.id)}>
+                        <Trash2 className="w-4.5 h-4.5" />
                       </Button>
                     </div>
                   </div>

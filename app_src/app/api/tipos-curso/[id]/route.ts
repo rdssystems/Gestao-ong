@@ -37,9 +37,22 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
 export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
   try {
-    await prisma.tipoCurso.update({ where: { id: params?.id }, data: { ativo: false } });
-    return NextResponse.json({ ok: true });
+    // Check if there are linked courses or interests before deleting
+    const linkedCursos = await prisma.curso.count({ where: { tipoCursoId: params?.id } });
+    if (linkedCursos > 0) {
+      return NextResponse.json(
+        { error: `Não é possível excluir: existem ${linkedCursos} oficinas vinculadas a este tipo.` },
+        { status: 400 }
+      );
+    }
+
+    await prisma.tipoCurso.delete({ where: { id: params?.id } });
+    return NextResponse.json({ success: true });
   } catch (error: any) {
-    return NextResponse.json({ error: error?.message ?? 'Erro' }, { status: 500 });
+    if (error?.code === 'P2003') {
+      return NextResponse.json({ error: 'Não é possível excluir: este registro possui dependências vinculadas.' }, { status: 400 });
+    }
+    return NextResponse.json({ error: error?.message ?? 'Erro ao excluir' }, { status: 500 });
   }
 }
+

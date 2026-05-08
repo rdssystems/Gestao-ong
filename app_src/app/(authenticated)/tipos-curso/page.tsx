@@ -64,12 +64,17 @@ export default function TiposCursoPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Desativar este tipo de oficina?')) return;
+    if (!confirm('Tem certeza que deseja excluir permanentemente este tipo de oficina?')) return;
     try {
-      await fetch(`/api/tipos-curso/${id}`, { method: 'DELETE' });
-      toast.success('Tipo desativado!');
+      const res = await fetch(`/api/tipos-curso/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erro ao excluir');
+      
+      toast.success('Tipo excluído com sucesso!');
       fetchData();
-    } catch { toast.error('Erro'); }
+    } catch (err: any) { 
+      toast.error(err.message); 
+    }
   };
 
   const openEdit = (t: TipoCurso) => {
@@ -148,9 +153,8 @@ export default function TiposCursoPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
-                      {!t?.ativo && <Badge variant="secondary" className="text-xs">Inativo</Badge>}
                       <Button variant="ghost" size="icon" onClick={() => openEdit(t)}><Pencil className="w-4 h-4" /></Button>
-                      {t?.ativo && <Button variant="ghost" size="icon" onClick={() => handleDelete(t?.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(t?.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                     </div>
                   </div>
                 </CardContent>
