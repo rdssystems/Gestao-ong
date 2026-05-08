@@ -8,10 +8,11 @@ echo "📥 Buscando atualizações no repositório..."
 git pull
 
 # 2. Reconstruir e subir os containers
-echo "🛠️ Reconstruindo containers (isso pode levar alguns minutos)..."
-docker-compose up -d --build
+echo "🛠️ Reconstruindo containers..."
+docker compose down
+docker compose up -d --build
 
-# 3. Aplicar migrações do Prisma (se houver mudanças no banco)
+# 3. Aplicar migrações do Prisma
 echo "🗄️ Aplicando migrações do banco de dados..."
 docker exec app_ong-app-1 npx prisma migrate deploy
 
