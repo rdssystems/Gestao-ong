@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
+    container_name: app_ong-postgres-1
     restart: always
     environment:
       POSTGRES_USER: gestao_ong
@@ -15,11 +16,15 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - default
+      - proxy
 
   app:
     build:
       context: ./app_src
       target: runner
+    container_name: app_ong-app-1
     restart: always
     volumes:
       - uploads_data:/app/public/uploads
@@ -30,11 +35,20 @@ services:
       WATCHPACK_POLLING: "true"
       DATABASE_URL: postgresql://gestao_ong:%40Slipknot12@postgres:5432/gestao_ong
       NEXTAUTH_SECRET: "f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0"
-      NEXTAUTH_URL: https://servidor-qualificacao.tailbeb7d5.ts.net:8443
+      NEXTAUTH_URL: https://gestaobalance.app.br
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - default
+      - proxy
 
 volumes:
   pgdata:
   uploads_data:
+
+networks:
+  default:
+  proxy:
+    external:
+      name: rds-pedidos_default
