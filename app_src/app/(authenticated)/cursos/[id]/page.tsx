@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { sexoBorderClass } from '@/lib/utils';
 
 export default function CursoDetailPage() {
   const params = useParams();
@@ -191,7 +192,7 @@ export default function CursoDetailPage() {
                 return (
                   <div key={m?.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors border border-transparent hover:border-border gap-3">
                     <Link href={`/alunos/${m?.aluno?.id}`} className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center flex-shrink-0">
+                      <div className={`w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center flex-shrink-0 ${sexoBorderClass(m?.aluno?.sexo)}`}>
                         {(m?.aluno?.nomeCompleto ?? '?')?.[0]?.toUpperCase?.() ?? '?'}
                       </div>
                       <p className="text-sm font-medium truncate">{m?.aluno?.nomeCompleto ?? ''}</p>

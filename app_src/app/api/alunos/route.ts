@@ -33,7 +33,7 @@ export async function GET(req: Request) {
       const alunos = await prisma.aluno.findMany({
         where: { ativo: true },
         orderBy: { nomeCompleto: 'asc' },
-        select: { id: true, nomeCompleto: true, cpf: true, email: true },
+        select: { id: true, nomeCompleto: true, cpf: true, email: true, sexo: true },
       });
       return NextResponse.json(alunos ?? []);
     }

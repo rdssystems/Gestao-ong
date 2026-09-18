@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import Link from 'next/link';
+import { sexoBorderClass } from '@/lib/utils';
 
 interface DashData {
   totalAlunos: number;
@@ -154,7 +155,7 @@ export default function DashboardPage() {
                   {data?.recentAlunos?.map?.((a: any) => (
                     <Link key={a?.id} href={`/alunos/${a?.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center">
+                        <div className={`w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center ${sexoBorderClass(a?.sexo)}`}>
                           {(a?.nomeCompleto ?? '?')?.[0]?.toUpperCase?.() ?? '?'}
                         </div>
                         <div>

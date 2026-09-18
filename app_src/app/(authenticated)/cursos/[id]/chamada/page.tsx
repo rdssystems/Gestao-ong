@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { sexoBorderClass } from '@/lib/utils';
 
 type Status = 'P' | 'A' | 'J';
 
@@ -128,7 +129,7 @@ export default function ChamadaPage() {
             <Card key={m.id} className="overflow-hidden">
               <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center">
+                  <div className={`w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center ${sexoBorderClass(m.aluno?.sexo)}`}>
                     {m.aluno.nomeCompleto[0]}
                   </div>
                   <div>

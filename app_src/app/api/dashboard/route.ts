@@ -13,7 +13,7 @@ export async function GET() {
         where: { ativo: true },
         orderBy: { createdAt: 'desc' },
         take: 5,
-        select: { id: true, nomeCompleto: true, email: true, createdAt: true },
+        select: { id: true, nomeCompleto: true, email: true, sexo: true, createdAt: true },
       }),
       prisma.curso.findMany({
         where: { ativo: true },

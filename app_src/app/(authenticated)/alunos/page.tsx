@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { sexoBorderClass } from '@/lib/utils';
 
 export default function AlunosPage() {
   const [alunos, setAlunos] = useState<any[]>([]);
@@ -205,7 +206,7 @@ export default function AlunosPage() {
         <div className="space-y-3">
           {alunos?.map?.((a: any, i: number) => (
             <motion.div key={a?.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
-              <Card className="hover:shadow-md transition-shadow overflow-hidden">
+              <Card className={`hover:shadow-md transition-shadow overflow-hidden ${sexoBorderClass(a?.sexo)}`}>
                 <div className="flex h-full">
                   {/* Lateral Photo */}
                   <div className="w-20 sm:w-28 bg-primary/5 flex-shrink-0 border-r border-border relative overflow-hidden flex items-center justify-center">

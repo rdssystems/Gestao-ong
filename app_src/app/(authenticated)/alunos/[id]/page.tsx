@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { formatDateOnly, sexoBorderClass } from '@/lib/utils';
 
 export default function AlunoDetailPage() {
   const params = useParams();
@@ -134,7 +135,7 @@ export default function AlunoDetailPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="relative group w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-primary/10 text-primary font-bold text-2xl flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm">
+          <div className={`relative group w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-primary/10 text-primary font-bold text-2xl flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm ${sexoBorderClass(aluno?.sexo)}`}>
             {aluno?.fotoUrl ? (
               <img src={aluno.fotoUrl} alt={aluno.nomeCompleto} className="w-full h-full object-cover" />
             ) : (
@@ -167,7 +168,7 @@ export default function AlunoDetailPage() {
             <CardHeader><CardTitle className="flex items-center gap-2"><User className="w-5 h-5" /> Dados do Participante</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-2 gap-4">
               {infoItem('Nome Completo', aluno?.nomeCompleto)}
-              {infoItem('Data de Nascimento', aluno?.dataNascimento ? format(new Date(aluno.dataNascimento), 'dd/MM/yyyy') : null)}
+              {infoItem('Data de Nascimento', formatDateOnly(aluno?.dataNascimento) || null)}
               {infoItem('Sexo', aluno?.sexo)}
             </CardContent>
           </Card>

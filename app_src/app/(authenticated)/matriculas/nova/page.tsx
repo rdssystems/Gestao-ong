@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { sexoBorderClass } from '@/lib/utils';
 
 export default function NovaMatriculaPage() {
   const router = useRouter();
@@ -137,7 +138,7 @@ export default function NovaMatriculaPage() {
                     onClick={() => setSelectedAluno(a?.id)}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center">
+                      <div className={`w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center ${sexoBorderClass(a?.sexo)}`}>
                         {(a?.nomeCompleto ?? '?')?.[0]?.toUpperCase?.() ?? '?'}
                       </div>
                       <div>
